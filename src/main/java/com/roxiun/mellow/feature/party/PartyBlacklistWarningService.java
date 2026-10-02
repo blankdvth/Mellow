@@ -31,7 +31,8 @@ public class PartyBlacklistWarningService {
     private enum FlagSource {
         LOCAL("§cLocal"),
         CORAL("§5Coral"),
-        SERAPH("§3Seraph");
+        SERAPH("§3Seraph"),
+        RACON("§1Racon");
 
         private final String coloredLabel;
 
@@ -151,6 +152,7 @@ public class PartyBlacklistWarningService {
 
         boolean shouldCheckCoral = config.isCoralEnabled();
         boolean shouldCheckSeraph = config.seraph;
+        boolean shouldCheckRacon = config.racon;
         long evaluationId = ++evaluationVersion;
 
         if ((!shouldCheckCoral && !shouldCheckSeraph) || playerCache == null) {
@@ -198,6 +200,13 @@ public class PartyBlacklistWarningService {
                     detection.setDetail(
                         FlagSource.SERAPH,
                         formatSeraphTagDetails(profile)
+                    );
+                }
+                if (shouldCheckRacon && profile.isRaconTagged()) {
+                    detection.addSource(FlagSource.RACON);
+                    detection.setDetail(
+                        FlagSource.RACON,
+                        formatRaconTagDetails(profile)
                     );
                 }
 
@@ -326,6 +335,13 @@ public class PartyBlacklistWarningService {
                 formatDetailWithFallback(detection.getDetail(FlagSource.SERAPH))
             );
         }
+        if (detection.sources.contains(FlagSource.RACON)) {
+            sourceDetails.add(
+                FlagSource.RACON.coloredLabel +
+                "§7: " +
+                formatDetailWithFallback(detection.getDetail(FlagSource.RACON))
+            );
+        }
         return String.join(" §7| ", sourceDetails);
     }
 
@@ -371,6 +387,12 @@ public class PartyBlacklistWarningService {
         return String.join("§7, ", lineParts);
     }
 
+    private String formatRaconTagDetails(PlayerProfile profile) {
+        return normalizeDetailText(
+            FormattingUtils.formatRaconTags(profile.getRaconTags())
+        );
+    }
+
     private String normalizeDetailText(String detail) {
         if (detail == null) {
             return "";
@@ -393,6 +415,9 @@ public class PartyBlacklistWarningService {
         }
         if (sources.contains(FlagSource.SERAPH)) {
             labels.add(FlagSource.SERAPH.coloredLabel);
+        }
+        if (sources.contains(FlagSource.RACON)) {
+            labels.add(FlagSource.RACON.coloredLabel);
         }
         return String.join("§7, ", labels);
     }

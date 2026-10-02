@@ -190,6 +190,24 @@ public class NickUtils {
                                             }
                                         }
                                     }
+
+                                    if (
+                                            config.racon &&
+                                                    profile.isRaconTagged()
+                                    ) {
+                                        String tags =
+                                                FormattingUtils.formatRaconTags(
+                                                        profile.getRaconTags()
+                                                );
+                                        String raconMessage =
+                                                "§c" +
+                                                        finalRealName +
+                                                        " is tagged on §1Racon§c for: " +
+                                                        tags;
+                                        MainThreadDispatcher.run(() ->
+                                                ChatUtils.sendMessage(raconMessage)
+                                        );
+                                    }
                                 });
                             }
                         }

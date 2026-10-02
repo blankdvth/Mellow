@@ -221,8 +221,10 @@ public class PregameStats {
             tagIgnoreManager != null && tagIgnoreManager.isTagIgnored(uuid);
         boolean coralTagged = config.isCoralEnabled() && profile.isCoralTagged();
         boolean seraphTagged = config.seraph && profile.isSeraphTagged();
+        boolean raconTagged = config.racon && profile.isRaconTagged();
         boolean shouldPrintCoralTagAlert = coralTagged && !tagsIgnored;
         boolean shouldPrintSeraphTagAlert = seraphTagged && !tagsIgnored;
+        boolean shouldPrintRaconTagAlert = raconTagged && !tagsIgnored;
         if (blacklisted || annoylisted) {
             BlacklistedPlayer blacklistedPlayer = blacklisted
                 ? blacklistManager.getBlacklistedPlayer(uuid)
@@ -296,11 +298,19 @@ public class PregameStats {
             }
         }
 
+        if (shouldPrintRaconTagAlert) {
+            String tags = FormattingUtils.formatRaconTags(profile.getRaconTags());
+            String raconMessage =
+                    "§c" + username + " is tagged on §1Racon§c for: " + tags;
+            MainThreadDispatcher.run(() -> ChatUtils.sendMessage(raconMessage));
+        }
+
         if (
             blacklisted ||
             annoylisted ||
             shouldPrintCoralTagAlert ||
-            shouldPrintSeraphTagAlert
+            shouldPrintSeraphTagAlert ||
+            shouldPrintRaconTagAlert
         ) {
             MainThreadDispatcher.run(() ->
                 pregameAlertSoundGate.tryPlayPling(mc, 1.0F, 1.0F)

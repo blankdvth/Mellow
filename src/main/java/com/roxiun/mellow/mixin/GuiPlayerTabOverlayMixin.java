@@ -3,6 +3,7 @@ package com.roxiun.mellow.mixin;
 import com.roxiun.mellow.Mellow;
 import com.roxiun.mellow.api.hypixel.HypixelFeatures;
 import com.roxiun.mellow.api.provider.model.StatScope;
+import com.roxiun.mellow.api.racon.RaconTag;
 import com.roxiun.mellow.api.seraph.SeraphTag;
 import com.roxiun.mellow.api.coral.CoralTag;
 import com.roxiun.mellow.data.TabStats;
@@ -82,6 +83,7 @@ public class GuiPlayerTabOverlayMixin {
                 TabStats emptyStats = new TabStats(
                     null, // coralTags
                     null, // seraphTags
+                    null, // raconTags
                     null, // formattedNameWithRank
                     null, // stars
                     null, // fkdr
@@ -117,6 +119,7 @@ public class GuiPlayerTabOverlayMixin {
                 TabStats emptyStats = new TabStats(
                     null, // coralTags
                     null, // seraphTags
+                    null, // raconTags
                     null, // formattedNameWithRank
                     null, // stars
                     null, // fkdr
@@ -205,6 +208,13 @@ public class GuiPlayerTabOverlayMixin {
             for (SeraphTag tag : stats.getSeraphTags()) {
                 newDisplayName +=
                     " " + FormattingUtils.formatSeraphTagIcon(tag);
+            }
+        }
+
+        if (Mellow.config.showRaconTagsInTab && stats.isRaconTagged()) {
+            for (RaconTag tag : stats.getRaconTags()) {
+                newDisplayName +=
+                        " " + FormattingUtils.formatRaconTagIcon(tag);
             }
         }
 

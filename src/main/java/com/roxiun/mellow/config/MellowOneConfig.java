@@ -1033,6 +1033,15 @@ public class MellowOneConfig extends Config {
     )
     public String seraphKey = "";
 
+    @Text(
+            name = "Racon API Key",
+            category = "API Keys",
+            subcategory = "Racon",
+            secure = true,
+            multiline = false
+    )
+    public String raconKey = "";
+
     @Switch(name = "Print Blacklist Tags", subcategory = "General")
     public boolean printBlacklistTags = true;
 
@@ -1152,6 +1161,29 @@ public class MellowOneConfig extends Config {
         category = "Seraph"
     )
     public static boolean ignoredSeraphInfo;
+
+    // Racon Configs
+    @Info(
+            text = "Racon API is a community blacklist, allowing you to see potential cheaters in your game",
+            size = OptionSize.DUAL,
+            type = InfoType.INFO,
+            category = "Racon"
+    )
+    public static boolean ignoredRaconDescription;
+
+    @Switch(name = "Enable Racon", category = "Racon")
+    public boolean racon = false;
+
+    @Switch(name = "Show Racon Tags in Tab", category = "Racon")
+    public boolean showRaconTagsInTab = true;
+
+    @Info(
+            text = "Enabling Racon will send requests to them and be subject to their ToS, this could enable tracking of your data (IP, Racon API Key, Game Info). Configure the key in API Keys > Racon.",
+            size = OptionSize.DUAL,
+            type = InfoType.WARNING,
+            category = "Racon"
+    )
+    public static boolean ignoredRaconWarning;
 
     // Winstreaks Configs
     @Info(

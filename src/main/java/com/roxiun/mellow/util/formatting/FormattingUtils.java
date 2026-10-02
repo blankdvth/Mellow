@@ -1,5 +1,6 @@
 package com.roxiun.mellow.util.formatting;
 
+import com.roxiun.mellow.api.racon.RaconTag;
 import com.roxiun.mellow.api.seraph.SeraphTag;
 import com.roxiun.mellow.api.coral.CoralTag;
 import java.util.List;
@@ -280,6 +281,102 @@ public static String formatSeraphTagIcon(SeraphTag tag) {
             return "";
     }
 }
+
+    public static String formatRaconTags(List<RaconTag> tags) {
+        return tags
+                .stream()
+                .map(FormattingUtils::formatRaconTag)
+                .collect(Collectors.joining(", "));
+    }
+
+    public static String formatRaconTag(RaconTag tag) {
+        if (tag == null || tag.getType() == null) {
+            return "";
+        }
+
+        String type = tag.getType();
+        String source = tag.getSourceLabel();
+        String formattedType;
+        String reason = tag.getReason() != null && !tag.getReason().isEmpty() ? tag.getReason() : "No reason provided";
+
+        // Use exact string matches to avoid substring replacement issues
+        switch (type.toLowerCase()) {
+            case "confirmed_cutie":
+                formattedType = "§d§lConfirmed Cutie";
+                break;
+            case "harmful_cheater":
+                formattedType = "§4§lHarmful Cheater";
+                break;
+            case "sniper":
+                formattedType = "§4§lSniper";
+                break;
+            case "confirmed_cheater":
+                formattedType = "§5§lConfirmed Cheater";
+                break;
+            case "blatant_cheater":
+                formattedType = "§6§lBlatant Cheater";
+                break;
+            case "closet_cheater":
+                formattedType = "§6§lCloset Cheater";
+                break;
+            case "legit_sniper":
+                formattedType = "§c§lLegit Sniper";
+                break;
+            case "caution":
+                formattedType = "§6§lCaution";
+                break;
+            case "replays_needed":
+                formattedType = "§7§lReplays Needed";
+                break;
+            case "account":
+                formattedType = "§6§lAccount";
+                break;
+            case "info":
+                formattedType = "§7§lInfo";
+                break;
+            case "wrong_rushing":
+                formattedType = "§e§lWrong Rushing";
+                break;
+            default:
+                // For unknown types, use the original type as-is
+                formattedType = type;
+                break;
+        }
+
+        return formattedType + " §7(" + reason + ", via " + source + ")";
+    }
+
+    public static String formatRaconTagIcon(RaconTag tag) {
+        String type = tag.getType().toLowerCase();
+        switch (type) {
+            case "confirmed_cutie":
+                return "§8[§dCU§8]";
+            case "harmful_cheater":
+                return "§8[§4HC§8]";
+            case "sniper":
+                return "§8[§4S§8]";
+            case "confirmed_cheater":
+                return "§8[§5CCC§8]";
+            case "blatant_cheater":
+                return "§8[§6BC§8]";
+            case "closet_cheater":
+                return "§8[§6CC§8]";
+            case "legit_sniper":
+                return "§8[§cLS§8]";
+            case "caution":
+                return "§8[§6C§8]";
+            case "replays_needed":
+                return "§8[§7RN§8]";
+            case "account":
+                return "§8[§6A§8]";
+            case "info":
+                return "§8[§7I§8]";
+            case "wrong_rushing":
+                return "§8[§eWR§8]";
+            default:
+                return "";
+        }
+    }
 
     public static String formatStars(String text) {
         try {

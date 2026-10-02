@@ -97,6 +97,13 @@ public class MellowCommand extends CommandBase {
             )
         );
         sender.addChatMessage(
+                new ChatComponentText(
+                    "§r§5" +
+                        "/racon|/mracon <username>" +
+                        ":§d View a player's Racon tags.§r"
+                )
+        );
+        sender.addChatMessage(
             new ChatComponentText(
                 "§r§5/denick <finals | beds> <number>:§d Manually denick a player based on finals or beds.§r"
             )

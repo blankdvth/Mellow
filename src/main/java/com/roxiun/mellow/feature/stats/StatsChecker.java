@@ -255,16 +255,18 @@ public class StatsChecker {
 
         boolean tabNeedsCoralTags = config.shouldShowCoralTagsInTab() && config.isCoralEnabled();
         boolean tabNeedsSeraphTags = config.showSeraphTagsInTab && config.seraph;
+        boolean tabNeedsRaconTags = config.showRaconTagsInTab && config.racon;
         boolean warningNeedsTags =
-            config.printBlacklistTags && (config.isCoralEnabled() || config.seraph);
-        return tabNeedsCoralTags || tabNeedsSeraphTags || warningNeedsTags;
+            config.printBlacklistTags && (config.isCoralEnabled() || config.seraph || config.racon);
+        return tabNeedsCoralTags || tabNeedsSeraphTags || tabNeedsRaconTags || warningNeedsTags;
     }
 
     private boolean shouldShowRemoteTagsInTab() {
         return (
             config != null &&
             ((config.shouldShowCoralTagsInTab() && config.isCoralEnabled()) ||
-                (config.showSeraphTagsInTab && config.seraph))
+                (config.showSeraphTagsInTab && config.seraph)) ||
+                (config.showRaconTagsInTab && config.racon)
         );
     }
 
@@ -328,7 +330,7 @@ public class StatsChecker {
         ) {
             return true;
         }
-        return config.printBlacklistTags && (config.isCoralEnabled() || config.seraph);
+        return config.printBlacklistTags && (config.isCoralEnabled() || config.seraph || config.racon);
     }
 
     private void warmSupplementalCaches(
@@ -785,6 +787,18 @@ public class StatsChecker {
             profile.isSeraphTagged();
         boolean shouldPrintSeraphTagAlert = seraphTagged && !tagsIgnored;
 
+        boolean raconTagged =
+                config.racon &&
+                        config.printBlacklistTags &&
+                        profile.isRaconTagged();
+        boolean shouldPrintRaconTagAlert = raconTagged && !tagsIgnored;
+        if (shouldPrintRaconTagAlert) {
+            String tags = FormattingUtils.formatRaconTags(profile.getRaconTags());
+            String raconMessage =
+                    "§c" + profile.getName() + " is tagged on §1Racon§c for: " + tags;
+            mc.addScheduledTask(() -> ChatUtils.sendMessage(raconMessage));
+        }
+
         boolean blacklisted = blacklistManager.isBlacklisted(uuid);
         boolean annoylisted =
             annoylistManager != null && annoylistManager.isAnnoylisted(uuid);
@@ -852,7 +866,8 @@ public class StatsChecker {
                 tabPlayerName,
                 blacklisted,
                 shouldPrintCoralTagAlert,
-                shouldPrintSeraphTagAlert
+                shouldPrintSeraphTagAlert,
+                shouldPrintRaconTagAlert
             )
         ) {
             sendOutboundOpponentWarning(
@@ -861,7 +876,8 @@ public class StatsChecker {
                 blacklistedPlayer,
                 blacklisted,
                 shouldPrintCoralTagAlert,
-                shouldPrintSeraphTagAlert
+                shouldPrintSeraphTagAlert,
+                shouldPrintRaconTagAlert
             );
         }
 
@@ -869,7 +885,8 @@ public class StatsChecker {
             blacklisted ||
             annoylisted ||
             shouldPrintCoralTagAlert ||
-            shouldPrintSeraphTagAlert
+            shouldPrintSeraphTagAlert ||
+            shouldPrintRaconTagAlert
         ) {
             mc.addScheduledTask(() ->
                 inGameAlertSoundGate.tryPlayPling(mc, 1.0F, 1.0F)
@@ -882,12 +899,13 @@ public class StatsChecker {
         String tabPlayerName,
         boolean blacklisted,
         boolean coralTagged,
-        boolean seraphTagged
+        boolean seraphTagged,
+        boolean raconTagged
     ) {
         if (uuid == null) {
             return false;
         }
-        if (!blacklisted && !coralTagged && !seraphTagged) {
+        if (!blacklisted && !coralTagged && !seraphTagged && !raconTagged) {
             return false;
         }
         if (!isInBedwarsMatch()) {
@@ -915,7 +933,8 @@ public class StatsChecker {
         BlacklistedPlayer blacklistedPlayer,
         boolean blacklisted,
         boolean coralTagged,
-        boolean seraphTagged
+        boolean seraphTagged,
+        boolean raconTagged
     ) {
         InGameBlacklistWarningDestination destination = resolveWarningDestination();
         String commandPrefix = destination.getCommandPrefix();
@@ -939,6 +958,9 @@ public class StatsChecker {
         if (seraphTagged) {
             sourceLabels.add("Seraph");
         }
+        if (raconTagged) {
+            sourceLabels.add("Racon");
+        }
 
         List<String> detailParts = new ArrayList<>(3);
         if (blacklisted) {
@@ -959,6 +981,14 @@ public class StatsChecker {
                 "Seraph: " +
                 normalizeOutboundDetail(
                     FormattingUtils.formatSeraphTags(profile.getSeraphTags())
+                )
+            );
+        }
+        if (raconTagged) {
+            detailParts.add(
+                "Racon: " +
+                normalizeOutboundDetail(
+                        FormattingUtils.formatRaconTags(profile.getRaconTags())
                 )
             );
         }

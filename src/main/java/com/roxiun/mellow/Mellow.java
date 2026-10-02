@@ -13,6 +13,7 @@ import com.roxiun.mellow.api.provider.HypixelPublicApi;
 import com.roxiun.mellow.api.provider.NadeshikoApi;
 import com.roxiun.mellow.api.provider.ProviderManager;
 import com.roxiun.mellow.api.provider.StatsProvider;
+import com.roxiun.mellow.api.racon.RaconApi;
 import com.roxiun.mellow.api.seraph.SeraphApi;
 import com.roxiun.mellow.api.seraph.SeraphClientCacheService;
 import com.roxiun.mellow.api.seraph.SeraphPingService;
@@ -76,6 +77,7 @@ public class Mellow {
     public static MojangApi mojangApi;
     public static CoralApi coralApi;
     public static SeraphApi seraphApi;
+    public static RaconApi raconApi;
     public static PlayerCache playerCache;
     public static BlacklistManager blacklistManager;
     public static AnnoylistManager annoylistManager;
@@ -111,6 +113,7 @@ public class Mellow {
         coralApi = new CoralApi();
         seraphApi = new SeraphApi(mojangApi);
         seraphClientCacheService = new SeraphClientCacheService(seraphApi, config);
+        raconApi = new RaconApi();
         auroraApi = new AuroraApi();
 
         playerCache = new PlayerCache(
@@ -118,6 +121,7 @@ public class Mellow {
             providerManager,
             coralApi,
             seraphApi,
+            raconApi,
             config
         );
         PartyBlacklistWarningService partyBlacklistWarningService =
@@ -263,6 +267,9 @@ public class Mellow {
         );
         ClientCommandHandler.instance.registerCommand(
             new SeraphCommand(seraphApi, mojangApi, config)
+        );
+        ClientCommandHandler.instance.registerCommand(
+            new RaconCommand(raconApi, config)
         );
         ClientCommandHandler.instance.registerCommand(
             new StatusCommand(mojangApi, config)

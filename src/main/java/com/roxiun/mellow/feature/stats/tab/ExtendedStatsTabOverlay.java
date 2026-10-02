@@ -6,6 +6,7 @@ import com.mojang.authlib.GameProfile;
 import com.roxiun.mellow.Mellow;
 import com.roxiun.mellow.api.hypixel.HypixelFeatures;
 import com.roxiun.mellow.api.provider.model.StatScope;
+import com.roxiun.mellow.api.racon.RaconTag;
 import com.roxiun.mellow.api.seraph.SeraphClientType;
 import com.roxiun.mellow.api.seraph.SeraphTag;
 import com.roxiun.mellow.api.coral.CoralTag;
@@ -1221,6 +1222,12 @@ public class ExtendedStatsTabOverlay extends GuiPlayerTabOverlay {
             }
         }
 
+        if (Mellow.config.showRaconTagsInTab && stats.isRaconTagged()) {
+            for (RaconTag tag : stats.getRaconTags()) {
+                safe += " " + FormattingUtils.formatRaconTagIcon(tag);
+            }
+        }
+
         return safe;
     }
 
@@ -1243,7 +1250,7 @@ public class ExtendedStatsTabOverlay extends GuiPlayerTabOverlay {
         String playerName = info.getGameProfile().getName();
         if (playerName != null) {
             TabStats stats = Mellow.tabStats.get(playerName);
-            if (stats != null && (stats.isCoralTagged() || stats.isSeraphTagged())) {
+            if (stats != null && (stats.isCoralTagged() || stats.isSeraphTagged() || stats.isRaconTagged())) {
                 return true;
             }
         }
@@ -1304,6 +1311,14 @@ public class ExtendedStatsTabOverlay extends GuiPlayerTabOverlay {
                         builder.append(" ");
                     }
                     builder.append(FormattingUtils.formatSeraphTagIcon(tag));
+                }
+            }
+            if (Mellow.config.showRaconTagsInTab && stats.isRaconTagged()) {
+                for (RaconTag tag : stats.getRaconTags()) {
+                    if (builder.length() > 0) {
+                        builder.append(" ");
+                    }
+                    builder.append(FormattingUtils.formatRaconTagIcon(tag));
                 }
             }
         }

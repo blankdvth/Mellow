@@ -21,7 +21,7 @@ public class PlayerProfileTabFormattingTest {
         );
         PlayerProfile profile = PlayerProfile
             .identity("uuid", "Player")
-            .withTags(Collections.singletonList(tag), null);
+            .withTags(Collections.singletonList(tag), null, null);
 
         TabStats tabStats = profile.getTabStats(StatScope.BEDWARS);
 

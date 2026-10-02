@@ -12,6 +12,8 @@ import com.roxiun.mellow.api.provider.StatsProvider;
 import com.roxiun.mellow.api.provider.model.FetchFailureReason;
 import com.roxiun.mellow.api.provider.model.ProviderResult;
 import com.roxiun.mellow.api.provider.model.StatScope;
+import com.roxiun.mellow.api.racon.RaconApi;
+import com.roxiun.mellow.api.racon.RaconTag;
 import com.roxiun.mellow.api.seraph.SeraphApi;
 import com.roxiun.mellow.api.seraph.SeraphTag;
 import com.roxiun.mellow.api.skywars.SkywarsPlayer;
@@ -43,9 +45,11 @@ public class PlayerCache {
     private final ProviderManager providerManager;
     private final CoralApi coralApi;
     private final SeraphApi seraphApi;
+    private final RaconApi raconApi;
     private final MellowOneConfig config;
     private volatile String lastCoralApiKey;
     private volatile String lastSeraphApiKey;
+    private volatile String lastRaconApiKey;
 
     private final AtomicBoolean hasWarnedMissingApiKey = new AtomicBoolean(false);
 
@@ -54,15 +58,18 @@ public class PlayerCache {
         ProviderManager providerManager,
         CoralApi coralApi,
         SeraphApi seraphApi,
+        RaconApi raconApi,
         MellowOneConfig config
     ) {
         this.mojangApi = mojangApi;
         this.providerManager = providerManager;
         this.coralApi = coralApi;
         this.seraphApi = seraphApi;
+        this.raconApi = raconApi;
         this.config = config;
         this.lastCoralApiKey = normalizeApiKey(config.getCoralApiKey());
         this.lastSeraphApiKey = normalizeApiKey(config.seraphKey);
+        this.lastRaconApiKey = normalizeApiKey(config.raconKey);
     }
 
     public PlayerProfile getProfile(String playerName) {
@@ -293,7 +300,18 @@ public class PlayerCache {
             } catch (IOException ignored) {}
         }
 
-        return profile.withTags(coralTags, seraphTags);
+        List<RaconTag> raconTags = profile.getRaconTags();
+        if (config.racon) {
+            try {
+                raconTags = raconApi.fetchRaconTags(
+                    uuid,
+                    profile.getName(),
+                    normalizeApiKey(config.raconKey)
+                );
+            } catch (IOException ignored) {}
+        }
+
+        return profile.withTags(coralTags, seraphTags, raconTags);
     }
 
     public StatsProvider getSelectedProvider() {
@@ -390,6 +408,7 @@ public class PlayerCache {
             duelsResult.getValue(),
             buildBattleResult.getValue(),
             tntRunResult.getValue(),
+            null,
             null,
             null
         );
@@ -492,6 +511,7 @@ public class PlayerCache {
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             provider.getDisplayName()
@@ -519,6 +539,7 @@ public class PlayerCache {
                 playerName,
                 null,
                 skywarsResult.getValue(),
+                null,
                 null,
                 null,
                 null,
@@ -555,6 +576,7 @@ public class PlayerCache {
                 null,
                 null,
                 null,
+                null,
                 null
             ),
             provider.getDisplayName()
@@ -584,6 +606,7 @@ public class PlayerCache {
                 null,
                 null,
                 buildBattleResult.getValue(),
+                null,
                 null,
                 null,
                 null
@@ -616,6 +639,7 @@ public class PlayerCache {
                 null,
                 null,
                 tntRunResult.getValue(),
+                null,
                 null,
                 null
             ),
@@ -695,6 +719,9 @@ public class PlayerCache {
         if (Mellow.seraphApi != null) {
             Mellow.seraphApi.clearCache();
         }
+        if (Mellow.raconApi != null) {
+            Mellow.raconApi.clearCache();
+        }
         if (Mellow.auroraApi != null) {
             Mellow.auroraApi.clearCache();
         }
@@ -756,6 +783,9 @@ public class PlayerCache {
         if (Mellow.seraphApi != null) {
             Mellow.seraphApi.clearPlayer(fullUuid);
         }
+        if (Mellow.raconApi != null) {
+            Mellow.raconApi.clearPlayer(fullUuid, playerName);
+        }
     }
 
     /** Clears only stats-provider data, preserving supplemental API gates. */
@@ -779,15 +809,18 @@ public class PlayerCache {
     private void maybeInvalidateCacheOnApiKeyChange() {
         String currentCoralApiKey = normalizeApiKey(config.getCoralApiKey());
         String currentSeraphApiKey = normalizeApiKey(config.seraphKey);
+        String currentRaconApiKey = normalizeApiKey(config.raconKey);
 
         boolean coralChanged = !currentCoralApiKey.equals(lastCoralApiKey);
         boolean seraphChanged = !currentSeraphApiKey.equals(lastSeraphApiKey);
-        if (!coralChanged && !seraphChanged) {
+        boolean raconChanged = !currentRaconApiKey.equals(lastRaconApiKey);
+        if (!coralChanged && !seraphChanged && !raconChanged) {
             return;
         }
 
         lastCoralApiKey = currentCoralApiKey;
         lastSeraphApiKey = currentSeraphApiKey;
+        lastRaconApiKey = currentRaconApiKey;
         clearCache();
     }
 

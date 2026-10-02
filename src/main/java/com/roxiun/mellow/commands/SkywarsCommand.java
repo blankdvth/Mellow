@@ -133,6 +133,16 @@ public class SkywarsCommand extends CommandBase {
                     }
                 }
             }
+
+            if (config.racon && profile.isRaconTagged()) {
+                String tags = FormattingUtils.formatRaconTags(
+                        profile.getRaconTags()
+                );
+                String coralMessage = "§1§lRacon§r§1: " + tags;
+                MainThreadDispatcher.run(() ->
+                        ChatUtils.sendMultilineCommandMessage(sender, coralMessage)
+                );
+            }
         });
     }
 

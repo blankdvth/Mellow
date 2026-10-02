@@ -1,5 +1,6 @@
 package com.roxiun.mellow.data;
 
+import com.roxiun.mellow.api.racon.RaconTag;
 import com.roxiun.mellow.api.seraph.SeraphTag;
 import com.roxiun.mellow.api.coral.CoralTag;
 import java.util.List;
@@ -8,6 +9,7 @@ public class TabStats {
 
     private final List<CoralTag> coralTags;
     private final List<SeraphTag> seraphTags;
+    private final List<RaconTag> raconTags;
     private final String formattedNameWithRank;
     private final String stars;
     private final String fkdr;
@@ -24,11 +26,13 @@ public class TabStats {
     public static TabStats tagsOnly(
         List<CoralTag> coralTags,
         List<SeraphTag> seraphTags,
+        List<RaconTag> raconTags,
         String playerName
     ) {
         return new TabStats(
             coralTags,
             seraphTags,
+            raconTags,
             playerName,
             null,
             null,
@@ -60,6 +64,7 @@ public class TabStats {
             coralTags,
             null,
             null,
+            null,
             stars,
             fkdr,
             winstreak,
@@ -91,6 +96,7 @@ public class TabStats {
         this(
             coralTags,
             seraphTags,
+            null,
             formattedNameWithRank,
             stars,
             fkdr,
@@ -107,6 +113,40 @@ public class TabStats {
     }
 
     public TabStats(
+            List<CoralTag> coralTags,
+            List<SeraphTag> seraphTags,
+            List<RaconTag> raconTags,
+            String formattedNameWithRank,
+            String stars,
+            String fkdr,
+            String winstreak,
+            String wlr,
+            String bblr,
+            String wins,
+            String kills,
+            String beds,
+            String finals
+    ) {
+        this(
+                coralTags,
+                seraphTags,
+                raconTags,
+                formattedNameWithRank,
+                stars,
+                fkdr,
+                winstreak,
+                wlr,
+                bblr,
+                wins,
+                null,
+                kills,
+                null,
+                beds,
+                finals
+        );
+    }
+
+    public TabStats(
         List<CoralTag> coralTags,
         String stars,
         String fkdr,
@@ -119,6 +159,7 @@ public class TabStats {
     ) {
         this(
             coralTags,
+            null,
             null,
             null,
             stars,
@@ -151,6 +192,7 @@ public class TabStats {
         this(
             coralTags,
             seraphTags,
+            null,
             formattedNameWithRank,
             stars,
             fkdr,
@@ -169,6 +211,7 @@ public class TabStats {
     public TabStats(
         List<CoralTag> coralTags,
         List<SeraphTag> seraphTags,
+        List<RaconTag> raconTags,
         String formattedNameWithRank,
         String stars,
         String fkdr,
@@ -184,6 +227,7 @@ public class TabStats {
     ) {
         this.coralTags = coralTags;
         this.seraphTags = seraphTags;
+        this.raconTags = raconTags;
         this.formattedNameWithRank = formattedNameWithRank;
         this.stars = stars;
         this.fkdr = fkdr;
@@ -206,12 +250,20 @@ public class TabStats {
         return seraphTags != null && !seraphTags.isEmpty();
     }
 
+    public boolean isRaconTagged() {
+        return raconTags != null && !raconTags.isEmpty();
+    }
+
     public List<CoralTag> getCoralTags() {
         return coralTags;
     }
 
     public List<SeraphTag> getSeraphTags() {
         return seraphTags;
+    }
+
+    public List<RaconTag> getRaconTags() {
+        return raconTags;
     }
 
     public String getFormattedNameWithRank() {

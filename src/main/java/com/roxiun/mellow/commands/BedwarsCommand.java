@@ -177,6 +177,32 @@ public class BedwarsCommand extends CommandBase {
                     }
                 }
             }
+
+            if (config.racon && profile.isRaconTagged()) {
+                List<String> raconMessages = new ArrayList<>();
+                profile.getRaconTags().forEach(tag -> {
+                    String formattedTag = FormattingUtils.formatRaconTag(tag);
+                    if (formattedTag == null || formattedTag.trim().isEmpty()) {
+                        return;
+                    }
+
+                    if (raconMessages.isEmpty()) {
+                        raconMessages.add("§1§lRacon§r§1: " + formattedTag);
+                        return;
+                    }
+
+                    raconMessages.add(formattedTag);
+                });
+
+                if (!raconMessages.isEmpty()) {
+                    MainThreadDispatcher.run(() ->
+                            ChatUtils.sendMultilineCommandMessage(
+                                    sender,
+                                    raconMessages
+                            )
+                    );
+                }
+            }
         });
     }
 
